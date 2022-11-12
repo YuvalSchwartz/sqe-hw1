@@ -25,15 +25,15 @@ public class ShoppingListTest {
     // addProduct
     //------------------------
 
-    @Test
-    public void add_product_success(){
-        String productID = "123";
-        when(supermarketMock.getPrice(productID)).thenReturn(5.0);
-        double priceBeforeAddingProduct = shoppingList.getMarketPrice();
-        shoppingList.addProduct(new Product("123", "bamba", 1));
-        double priceAfterAddingProduct = shoppingList.getMarketPrice();
-        assertEquals(priceBeforeAddingProduct + 5, priceAfterAddingProduct);
-    }
+//    @Test
+//    public void add_product_success(){
+//        String productID = "123";
+//        when(supermarketMock.getPrice(productID)).thenReturn(5.0);
+//        double priceBeforeAddingProduct = shoppingList.getMarketPrice();
+//        shoppingList.addProduct(new Product("123", "bamba", 1));
+//        double priceAfterAddingProduct = shoppingList.getMarketPrice();
+//        assertEquals(priceBeforeAddingProduct + 5, priceAfterAddingProduct);
+//    }
 
     //------------------------
     // getMarketPrice
