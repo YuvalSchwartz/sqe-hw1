@@ -1,3 +1,4 @@
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -8,12 +9,9 @@ import sise.sqe.Product;
 import sise.sqe.ShoppingList;
 import sise.sqe.Supermarket;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Matchers.anyDouble;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
@@ -45,6 +43,10 @@ public class ShoppingListTest {
 
     //------------------------
     // addProduct
+    //------------------------
+
+    //------------------------
+    // getMarketPrice
     //------------------------
 
     @ParameterizedTest
@@ -106,13 +108,56 @@ public class ShoppingListTest {
     // getDiscount
     //------------------------
 
+    @Test
+    public void testGetDiscountWithNegativePrice() {
+        Supermarket supermarketMock = Mockito.mock(Supermarket.class);
+        ShoppingList shoppingList = new ShoppingList(supermarketMock);
+        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {shoppingList.getDiscount(-1);});
 
+        assertEquals("Price cannot be negative", thrown.getMessage());
+    }
+
+    @Test
+    public void testGetDiscountForFifteenPercent() {
+        Supermarket supermarketMock = Mockito.mock(Supermarket.class);
+        ShoppingList shoppingList = new ShoppingList(supermarketMock);
+
+        assertEquals(0.85, shoppingList.getDiscount(1265.33));
+    }
+
+    @Test
+    public void testGetDiscountForTenPercent() {
+        Supermarket supermarketMock = Mockito.mock(Supermarket.class);
+        ShoppingList shoppingList = new ShoppingList(supermarketMock);
+
+        assertEquals(0.9, shoppingList.getDiscount(848.56));
+    }
+
+    @Test
+    public void testGetDiscountForFivePercent() {
+        Supermarket supermarketMock = Mockito.mock(Supermarket.class);
+        ShoppingList shoppingList = new ShoppingList(supermarketMock);
+
+        assertEquals(0.95, shoppingList.getDiscount(555.55));
+    }
+
+    @Test
+    public void testGetDiscountForZeroPercent() {
+        Supermarket supermarketMock = Mockito.mock(Supermarket.class);
+        ShoppingList shoppingList = new ShoppingList(supermarketMock);
+
+        assertEquals(1.0, shoppingList.getDiscount(1.1));
+    }
 
     //------------------------
     // priceWithDelivery
     //------------------------
 
+    //TODO: implement
+
     //------------------------
     // changeQuantity
     //------------------------
+
+    //TODO: implement
 }
