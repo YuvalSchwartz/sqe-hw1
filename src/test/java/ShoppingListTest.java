@@ -65,27 +65,48 @@ public class ShoppingListTest {
     }
 
     private static Stream<Arguments> getMarketPriceParams() {
-        Product p1 = new Product("p1", "p1", 5);
-        Product p2 = new Product("p2", "p2", 0);
-        Product p3 = new Product("p3", "p3", 0);
-        Product p4 = new Product("p4", "p4", 0);
-        Product p5 = new Product("p5", "p5", 0);
-        Product p6 = new Product("p6", "p6", 0);
+        Product noQuantityProduct1 = new Product("p1", "p1", 0);
+        Product noQuantityProduct2 = new Product("p2", "p2", 0);
+        Product noQuantityProduct3 = new Product("p3", "p3", 0);
+        Product regularQuantityProduct1 = new Product("p4", "p4", 4);
+        Product regularQuantityProduct2 = new Product("p5", "p5", 5);
+        Product regularQuantityProduct3 = new Product("p6", "p6", 6);
         return Stream.of(
+                //empty lists under all discount options:
                 Arguments.of(null, null, 1.0, 0.0),
                 Arguments.of(null, null, 0.95, 0.0),
                 Arguments.of(null, null, 0.9, 0.0),
                 Arguments.of(null, null, 0.85, 0.0),
-                Arguments.of(new Product[]{p1}, new double[]{0.0}, 1.0, 0.0),
-                Arguments.of(new Product[]{p1}, new double[]{0.0}, 0.95, 0.0),
-                Arguments.of(new Product[]{p1}, new double[]{0.0}, 0.9, 0.0),
-                Arguments.of(new Product[]{p1}, new double[]{0.0}, 0.85, 0.0)
+                //shopping lists made of several items (all of them with zero price and zero quantity) under all discount options:
+                Arguments.of(new Product[]{noQuantityProduct1, noQuantityProduct2, noQuantityProduct3}, new double[]{0.0, 0.0, 0.0}, 1.0, 0.0),
+                Arguments.of(new Product[]{noQuantityProduct1, noQuantityProduct2, noQuantityProduct3}, new double[]{0.0, 0.0, 0.0}, 0.95, 0.0),
+                Arguments.of(new Product[]{noQuantityProduct1, noQuantityProduct2, noQuantityProduct3}, new double[]{0.0, 0.0, 0.0}, 0.9, 0.0),
+                Arguments.of(new Product[]{noQuantityProduct1, noQuantityProduct2, noQuantityProduct3}, new double[]{0.0, 0.0, 0.0}, 0.85, 0.0),
+                //shopping lists made of several items (all of them with certain price but zero quantity) under all discount options:
+                Arguments.of(new Product[]{noQuantityProduct1, noQuantityProduct2, noQuantityProduct3}, new double[]{4.0, 6.3, 11.7}, 1.0, 0.0),
+                Arguments.of(new Product[]{noQuantityProduct1, noQuantityProduct2, noQuantityProduct3}, new double[]{2.5, 7.3, 9.0}, 0.95, 0.0),
+                Arguments.of(new Product[]{noQuantityProduct1, noQuantityProduct2, noQuantityProduct3}, new double[]{8.9, 1.1, 1.0}, 0.9, 0.0),
+                Arguments.of(new Product[]{noQuantityProduct1, noQuantityProduct2, noQuantityProduct3}, new double[]{10.10, 4.4, 1.99}, 0.85, 0.0),
+                //shopping lists made of several items (all of them with certain quantity but zero price) under all discount options:
+                Arguments.of(new Product[]{regularQuantityProduct1, regularQuantityProduct2, regularQuantityProduct3}, new double[]{0.0, 0.0, 0.0}, 1.0, 0.0),
+                Arguments.of(new Product[]{regularQuantityProduct1, regularQuantityProduct2, regularQuantityProduct3}, new double[]{0.0, 0.0, 0.0}, 0.95, 0.0),
+                Arguments.of(new Product[]{regularQuantityProduct1, regularQuantityProduct2, regularQuantityProduct3}, new double[]{0.0, 0.0, 0.0}, 0.9, 0.0),
+                Arguments.of(new Product[]{regularQuantityProduct1, regularQuantityProduct2, regularQuantityProduct3}, new double[]{0.0, 0.0, 0.0}, 0.85, 0.0),
+                //shopping lists made of several items with mixed features:
+                Arguments.of(new Product[]{regularQuantityProduct1, noQuantityProduct1, regularQuantityProduct2, noQuantityProduct2}, new double[]{101.99, 98.5, 500.6, 333.2}, 0.85, 2474.316),
+                Arguments.of(new Product[]{noQuantityProduct1, noQuantityProduct2, regularQuantityProduct1}, new double[]{15.3, 33.6, 200.0}, 0.9, 720.0),
+                Arguments.of(new Product[]{regularQuantityProduct1, regularQuantityProduct2, regularQuantityProduct3}, new double[]{120.3, 207.0, 111.1}, 0.85, 1855.38),
+                Arguments.of(new Product[]{regularQuantityProduct1, regularQuantityProduct2, regularQuantityProduct3, noQuantityProduct1}, new double[]{1.0, 2.2, 5.3, 66.0}, 1.0, 46.8),
+                Arguments.of(new Product[]{regularQuantityProduct1, regularQuantityProduct2, regularQuantityProduct3}, new double[]{30.5, 20.6, 46.7}, 0.95, 479.94),
+                Arguments.of(new Product[]{noQuantityProduct1, regularQuantityProduct1, regularQuantityProduct2, regularQuantityProduct3, noQuantityProduct2}, new double[]{5.4, 90.0, 50.3, 48.1, 22.0}, 0.9, 810.09)
         );
     }
 
     //------------------------
     // getDiscount
     //------------------------
+
+
 
     //------------------------
     // priceWithDelivery
