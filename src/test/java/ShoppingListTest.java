@@ -4,11 +4,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.InjectMocks;
 import org.mockito.Mockito;
+import org.mockito.Spy;
 import sise.sqe.Product;
 import sise.sqe.ShoppingList;
 import sise.sqe.Supermarket;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -44,6 +48,23 @@ public class ShoppingListTest {
     //------------------------
     // addProduct
     //------------------------
+
+//    @Spy
+//    List<Product> products;
+//
+//    @InjectMocks
+//    ShoppingList shoppingList;
+//
+//    @Test
+//    public void testAddProduct() {
+//        Supermarket supermarketMock = Mockito.mock(Supermarket.class);
+//        ShoppingList shoppingList = new ShoppingList(supermarketMock);
+//        Product p = new Product("p1", "p1", 5);
+//
+//        List<Product> expectedProducts = Arrays.asList(p);
+//        List<Product> actualProducts = products;
+//        assertEquals(expectedProducts, actualProducts);
+//    }
 
     //------------------------
     // getMarketPrice
