@@ -1,5 +1,3 @@
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -9,7 +7,6 @@ import org.mockito.internal.util.reflection.Whitebox;
 import sise.sqe.Product;
 import sise.sqe.ShoppingList;
 import sise.sqe.Supermarket;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
@@ -20,21 +17,9 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 public class ShoppingListTest {
-//    static Supermarket supermarketMock = null;
-//    static ShoppingList shoppingList;
-//    static ShoppingList shoppingListSpy;
-//    static Product bamba;
-
-//    @BeforeAll
-//    public static void init(){
-//        supermarketMock = Mockito.mock(Supermarket.class);
-//        shoppingList = new ShoppingList(supermarketMock);
-//        shoppingListSpy = spy(shoppingList);
-//        bamba = new Product("123", "Bamba", 1);
-//    }
 
     //------------------------
-    // Constructor
+    // Constructor tests
     //------------------------
 
     @Test
@@ -45,7 +30,7 @@ public class ShoppingListTest {
     }
 
     //------------------------
-    // addProduct
+    // addProduct tests
     //------------------------
 
     @ParameterizedTest
@@ -117,7 +102,7 @@ public class ShoppingListTest {
     }
 
     //------------------------
-    // getMarketPrice
+    // getMarketPrice tests
     //------------------------
 
     @ParameterizedTest
@@ -176,7 +161,7 @@ public class ShoppingListTest {
     }
 
     //------------------------
-    // getDiscount
+    // getDiscount tests
     //------------------------
 
     @Test
@@ -221,13 +206,13 @@ public class ShoppingListTest {
     }
 
     //------------------------
-    // priceWithDelivery
+    // priceWithDelivery tests
     //------------------------
 
     //TODO: implement
 
     //------------------------
-    // changeQuantity
+    // changeQuantity tests
     //------------------------
 
     //TODO: implement
