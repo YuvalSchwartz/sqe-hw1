@@ -48,105 +48,72 @@ public class ShoppingListTest {
     // addProduct
     //------------------------
 
-    @Test
-    public void testAddProductWithZeroQuantityProductsToEmptyList() {
+    @ParameterizedTest
+    @MethodSource("addProductParams")
+    public void testAddProductWithCombinationsOfProductsAndLists(List<Product> productsListBeforeAdding, Product[] productsToAdd, int expectedResult) {
         Supermarket supermarketMock = Mockito.mock(Supermarket.class);
         ShoppingList shoppingList = new ShoppingList(supermarketMock);
-        Product p1 = new Product("p1", "p1", 0);
-        Product p2 = new Product("p2", "p2", 0);
-        Product p3 = new Product("p3", "p3", 0);
-        shoppingList.addProduct(p1);
-        shoppingList.addProduct(p2);
-        shoppingList.addProduct(p3);
+        Whitebox.setInternalState(shoppingList, "products", productsListBeforeAdding);
+        if(productsToAdd != null) {
+            for(int i = 0; i < productsToAdd.length; i++)
+                shoppingList.addProduct(productsToAdd[i]);
+        }
         int numOfProductsAfterAdding = ((List<Product>)Whitebox.getInternalState(shoppingList, "products")).size();
 
-        assertEquals(3, numOfProductsAfterAdding);
+        assertEquals(expectedResult, numOfProductsAfterAdding);
     }
 
-    @Test
-    public void testAddProductWithPositiveQuantityProductsToEmptyList() {
-        Supermarket supermarketMock = Mockito.mock(Supermarket.class);
-        ShoppingList shoppingList = new ShoppingList(supermarketMock);
-        Product p1 = new Product("p1", "p1", 4);
-        Product p2 = new Product("p2", "p2", 2);
-        Product p3 = new Product("p3", "p3", 9);
-        shoppingList.addProduct(p1);
-        shoppingList.addProduct(p2);
-        shoppingList.addProduct(p3);
-        int numOfProductsAfterAdding = ((List<Product>)Whitebox.getInternalState(shoppingList, "products")).size();
+    private static Stream<Arguments> addProductParams() {
+        Product noQuantityProduct1 = new Product("p1", "p1", 0);
+        Product noQuantityProduct2 = new Product("p2", "p2", 0);
+        Product noQuantityProduct3 = new Product("p3", "p3", 0);
+        Product noQuantityProduct4 = new Product("p4", "p4", 0);
+        Product noQuantityProduct5 = new Product("p5", "p5", 0);
+        Product noQuantityProduct6 = new Product("p6", "p6", 0);
+        Product positiveQuantityProduct1 = new Product("p7", "p7", 1);
+        Product positiveQuantityProduct2 = new Product("p8", "p8", 9);
+        Product positiveQuantityProduct3 = new Product("p9", "p9", 14);
+        Product positiveQuantityProduct4 = new Product("p10", "p10", 2);
+        Product positiveQuantityProduct5 = new Product("p11", "p11", 2);
+        Product positiveQuantityProduct6 = new Product("p12", "p12", 4);
 
-        assertEquals(3, numOfProductsAfterAdding);
-    }
+        List<Product> zeroQuantityProductsList = new ArrayList<>();
+        zeroQuantityProductsList.add(noQuantityProduct1);
+        zeroQuantityProductsList.add(noQuantityProduct2);
+        zeroQuantityProductsList.add(noQuantityProduct3);
 
-    @Test
-    public void testAddProductWithMixedProductsToEmptyList() {
-        Supermarket supermarketMock = Mockito.mock(Supermarket.class);
-        ShoppingList shoppingList = new ShoppingList(supermarketMock);
-        Product p1 = new Product("p1", "p1", 2);
-        Product p2 = new Product("p2", "p2", 0);
-        Product p3 = new Product("p3", "p3", 5);
-        Product p4 = new Product("p4", "p4", 0);
-        shoppingList.addProduct(p1);
-        shoppingList.addProduct(p2);
-        shoppingList.addProduct(p3);
-        shoppingList.addProduct(p4);
-        int numOfProductsAfterAdding = ((List<Product>)Whitebox.getInternalState(shoppingList, "products")).size();
+        List<Product> positiveQuantityProductsList = new ArrayList<>();
+        positiveQuantityProductsList.add(positiveQuantityProduct1);
+        positiveQuantityProductsList.add(positiveQuantityProduct2);
+        positiveQuantityProductsList.add(positiveQuantityProduct3);
 
-        assertEquals(4, numOfProductsAfterAdding);
-    }
+        List<Product> mixedQuantityProductsList = new ArrayList<>();
+        mixedQuantityProductsList.add(positiveQuantityProduct1);
+        mixedQuantityProductsList.add(noQuantityProduct1);
+        mixedQuantityProductsList.add(noQuantityProduct2);
+        mixedQuantityProductsList.add(positiveQuantityProduct2);
 
-    @Test
-    public void testAddProductWithZeroQuantityProductsToNonEmptyList() {
-        Supermarket supermarketMock = Mockito.mock(Supermarket.class);
-        ShoppingList shoppingList = new ShoppingList(supermarketMock);
-        List<Product> productsList = new ArrayList<>();
-        productsList.add(new Product("p1", "p1", 7));
-        productsList.add(new Product("p2", "p2", 2));
-        Whitebox.setInternalState(shoppingList, "products", productsList);
-        int numOfProductsBeforeAdding = ((List<Product>)Whitebox.getInternalState(shoppingList, "products")).size();
-        Product p3 = new Product("p3", "p3", 0);
-        Product p4 = new Product("p4", "p4", 0);
-        shoppingList.addProduct(p3);
-        shoppingList.addProduct(p4);
-        int numOfProductsAfterAdding = ((List<Product>)Whitebox.getInternalState(shoppingList, "products")).size();
-
-        assertEquals(2, numOfProductsAfterAdding - numOfProductsBeforeAdding);
-    }
-
-    @Test
-    public void testAddProductWithPositiveQuantityProductsToNonEmptyList() {
-        Supermarket supermarketMock = Mockito.mock(Supermarket.class);
-        ShoppingList shoppingList = new ShoppingList(supermarketMock);
-        List<Product> productsList = new ArrayList<>();
-        productsList.add(new Product("p1", "p1", 3));
-        Whitebox.setInternalState(shoppingList, "products", productsList);
-        int numOfProductsBeforeAdding = ((List<Product>)Whitebox.getInternalState(shoppingList, "products")).size();
-        Product p2 = new Product("p2", "p2", 4);
-        Product p3 = new Product("p3", "p3", 9);
-        Product p4 = new Product("p4", "p4", 8);
-        shoppingList.addProduct(p2);
-        shoppingList.addProduct(p3);
-        shoppingList.addProduct(p4);
-        int numOfProductsAfterAdding = ((List<Product>)Whitebox.getInternalState(shoppingList, "products")).size();
-
-        assertEquals(3, numOfProductsAfterAdding - numOfProductsBeforeAdding);
-    }
-
-    @Test
-    public void testAddProductWithMixedQuantityProductsToNonEmptyList() {
-        Supermarket supermarketMock = Mockito.mock(Supermarket.class);
-        ShoppingList shoppingList = new ShoppingList(supermarketMock);
-        List<Product> productsList = new ArrayList<>();
-        productsList.add(new Product("p1", "p1", 4));
-        Whitebox.setInternalState(shoppingList, "products", productsList);
-        int numOfProductsBeforeAdding = ((List<Product>)Whitebox.getInternalState(shoppingList, "products")).size();
-        Product p2 = new Product("p2", "p2", 0);
-        Product p3 = new Product("p3", "p3", 6);
-        shoppingList.addProduct(p2);
-        shoppingList.addProduct(p3);
-        int numOfProductsAfterAdding = ((List<Product>)Whitebox.getInternalState(shoppingList, "products")).size();
-
-        assertEquals(2, numOfProductsAfterAdding - numOfProductsBeforeAdding);
+        return Stream.of(
+                //adding zero quantity products to empty list:
+                Arguments.of(new ArrayList<>(), new Product[]{noQuantityProduct1, noQuantityProduct2, noQuantityProduct3}, 3),
+                //adding positive quantity products to empty list:
+                Arguments.of(new ArrayList<>(), new Product[]{positiveQuantityProduct1, positiveQuantityProduct2, positiveQuantityProduct3, positiveQuantityProduct4}, 4),
+                //adding mixed quantity products to empty list:
+                Arguments.of(new ArrayList<>(), new Product[]{positiveQuantityProduct1, noQuantityProduct1}, 2),
+                //adding zero quantity products to non-empty list with zero quantity products:
+                Arguments.of(new ArrayList<>(zeroQuantityProductsList), new Product[]{noQuantityProduct4, noQuantityProduct5, noQuantityProduct6}, 3),
+                //adding positive quantity products to non-empty list with zero quantity products:
+                Arguments.of(new ArrayList<>(zeroQuantityProductsList), new Product[]{positiveQuantityProduct1, positiveQuantityProduct2}, 2),
+                //adding mixed quantity products to non-empty list with zero quantity products:
+                Arguments.of(new ArrayList<>(zeroQuantityProductsList), new Product[]{positiveQuantityProduct1, positiveQuantityProduct2, noQuantityProduct4, noQuantityProduct5}, 4),
+                //adding zero quantity products to non-empty list with positive quantity products:
+                Arguments.of(new ArrayList<>(positiveQuantityProductsList), new Product[]{noQuantityProduct1}, 1),
+                //adding positive quantity products to non-empty list with positive quantity products:
+                Arguments.of(new ArrayList<>(positiveQuantityProductsList), new Product[]{positiveQuantityProduct4, positiveQuantityProduct5}, 2),
+                //adding mixed quantity products to non-empty list with positive quantity products:
+                Arguments.of(new ArrayList<>(positiveQuantityProductsList), new Product[]{positiveQuantityProduct3, noQuantityProduct3, noQuantityProduct4}, 3)
+                //TODO: continue
+        );
     }
 
     //------------------------
@@ -155,7 +122,7 @@ public class ShoppingListTest {
 
     @ParameterizedTest
     @MethodSource("getMarketPriceParams")
-    public void testAllCombinationsOfMarketPrices(Product[] productsArray, double[] productsPrices, double discount, double expected) {
+    public void testAllCombinationsOfMarketPrices(Product[] productsArray, double[] productsPrices, double discount, double expectedResult) {
         Supermarket supermarketMock = Mockito.mock(Supermarket.class);
         ShoppingList shoppingList = new ShoppingList(supermarketMock);
         ShoppingList shoppingListSpy = spy(shoppingList);
@@ -167,16 +134,16 @@ public class ShoppingListTest {
         }
         when(shoppingListSpy.getDiscount(anyDouble())).thenReturn(discount);
 
-        assertEquals(expected, shoppingListSpy.getMarketPrice());
+        assertEquals(expectedResult, shoppingListSpy.getMarketPrice());
     }
 
     private static Stream<Arguments> getMarketPriceParams() {
         Product noQuantityProduct1 = new Product("p1", "p1", 0);
         Product noQuantityProduct2 = new Product("p2", "p2", 0);
         Product noQuantityProduct3 = new Product("p3", "p3", 0);
-        Product regularQuantityProduct1 = new Product("p4", "p4", 4);
-        Product regularQuantityProduct2 = new Product("p5", "p5", 5);
-        Product regularQuantityProduct3 = new Product("p6", "p6", 6);
+        Product positiveQuantityProduct1 = new Product("p4", "p4", 4);
+        Product positiveQuantityProduct2 = new Product("p5", "p5", 5);
+        Product positiveQuantityProduct3 = new Product("p6", "p6", 6);
         return Stream.of(
                 //empty lists under all discount options:
                 Arguments.of(null, null, 1.0, 0.0),
@@ -194,17 +161,17 @@ public class ShoppingListTest {
                 Arguments.of(new Product[]{noQuantityProduct1, noQuantityProduct2, noQuantityProduct3}, new double[]{8.9, 1.1, 1.0}, 0.9, 0.0),
                 Arguments.of(new Product[]{noQuantityProduct1, noQuantityProduct2, noQuantityProduct3}, new double[]{10.10, 4.4, 1.99}, 0.85, 0.0),
                 //shopping lists made of several items (all of them with certain quantity but zero price) under all discount options:
-                Arguments.of(new Product[]{regularQuantityProduct1, regularQuantityProduct2, regularQuantityProduct3}, new double[]{0.0, 0.0, 0.0}, 1.0, 0.0),
-                Arguments.of(new Product[]{regularQuantityProduct1, regularQuantityProduct2, regularQuantityProduct3}, new double[]{0.0, 0.0, 0.0}, 0.95, 0.0),
-                Arguments.of(new Product[]{regularQuantityProduct1, regularQuantityProduct2, regularQuantityProduct3}, new double[]{0.0, 0.0, 0.0}, 0.9, 0.0),
-                Arguments.of(new Product[]{regularQuantityProduct1, regularQuantityProduct2, regularQuantityProduct3}, new double[]{0.0, 0.0, 0.0}, 0.85, 0.0),
+                Arguments.of(new Product[]{positiveQuantityProduct1, positiveQuantityProduct2, positiveQuantityProduct3}, new double[]{0.0, 0.0, 0.0}, 1.0, 0.0),
+                Arguments.of(new Product[]{positiveQuantityProduct1, positiveQuantityProduct2, positiveQuantityProduct3}, new double[]{0.0, 0.0, 0.0}, 0.95, 0.0),
+                Arguments.of(new Product[]{positiveQuantityProduct1, positiveQuantityProduct2, positiveQuantityProduct3}, new double[]{0.0, 0.0, 0.0}, 0.9, 0.0),
+                Arguments.of(new Product[]{positiveQuantityProduct1, positiveQuantityProduct2, positiveQuantityProduct3}, new double[]{0.0, 0.0, 0.0}, 0.85, 0.0),
                 //shopping lists made of several items with mixed features:
-                Arguments.of(new Product[]{regularQuantityProduct1, noQuantityProduct1, regularQuantityProduct2, noQuantityProduct2}, new double[]{101.99, 98.5, 500.6, 333.2}, 0.85, 2474.316),
-                Arguments.of(new Product[]{noQuantityProduct1, noQuantityProduct2, regularQuantityProduct1}, new double[]{15.3, 33.6, 200.0}, 0.9, 720.0),
-                Arguments.of(new Product[]{regularQuantityProduct1, regularQuantityProduct2, regularQuantityProduct3}, new double[]{120.3, 207.0, 111.1}, 0.85, 1855.38),
-                Arguments.of(new Product[]{regularQuantityProduct1, regularQuantityProduct2, regularQuantityProduct3, noQuantityProduct1}, new double[]{1.0, 2.2, 5.3, 66.0}, 1.0, 46.8),
-                Arguments.of(new Product[]{regularQuantityProduct1, regularQuantityProduct2, regularQuantityProduct3}, new double[]{30.5, 20.6, 46.7}, 0.95, 479.94),
-                Arguments.of(new Product[]{noQuantityProduct1, regularQuantityProduct1, regularQuantityProduct2, regularQuantityProduct3, noQuantityProduct2}, new double[]{5.4, 90.0, 50.3, 48.1, 22.0}, 0.9, 810.09)
+                Arguments.of(new Product[]{positiveQuantityProduct1, noQuantityProduct1, positiveQuantityProduct2, noQuantityProduct2}, new double[]{101.99, 98.5, 500.6, 333.2}, 0.85, 2474.316),
+                Arguments.of(new Product[]{noQuantityProduct1, noQuantityProduct2, positiveQuantityProduct1}, new double[]{15.3, 33.6, 200.0}, 0.9, 720.0),
+                Arguments.of(new Product[]{positiveQuantityProduct1, positiveQuantityProduct2, positiveQuantityProduct3}, new double[]{120.3, 207.0, 111.1}, 0.85, 1855.38),
+                Arguments.of(new Product[]{positiveQuantityProduct1, positiveQuantityProduct2, positiveQuantityProduct3, noQuantityProduct1}, new double[]{1.0, 2.2, 5.3, 66.0}, 1.0, 46.8),
+                Arguments.of(new Product[]{positiveQuantityProduct1, positiveQuantityProduct2, positiveQuantityProduct3}, new double[]{30.5, 20.6, 46.7}, 0.95, 479.94),
+                Arguments.of(new Product[]{noQuantityProduct1, positiveQuantityProduct1, positiveQuantityProduct2, positiveQuantityProduct3, noQuantityProduct2}, new double[]{5.4, 90.0, 50.3, 48.1, 22.0}, 0.9, 810.09)
         );
     }
 
