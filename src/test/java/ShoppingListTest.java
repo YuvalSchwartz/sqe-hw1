@@ -4,14 +4,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.InjectMocks;
 import org.mockito.Mockito;
-import org.mockito.Spy;
+import org.mockito.internal.util.reflection.Whitebox;
 import sise.sqe.Product;
 import sise.sqe.ShoppingList;
 import sise.sqe.Supermarket;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -49,22 +48,106 @@ public class ShoppingListTest {
     // addProduct
     //------------------------
 
-//    @Spy
-//    List<Product> products;
-//
-//    @InjectMocks
-//    ShoppingList shoppingList;
-//
-//    @Test
-//    public void testAddProduct() {
-//        Supermarket supermarketMock = Mockito.mock(Supermarket.class);
-//        ShoppingList shoppingList = new ShoppingList(supermarketMock);
-//        Product p = new Product("p1", "p1", 5);
-//
-//        List<Product> expectedProducts = Arrays.asList(p);
-//        List<Product> actualProducts = products;
-//        assertEquals(expectedProducts, actualProducts);
-//    }
+    @Test
+    public void testAddProductWithZeroQuantityProductsToEmptyList() {
+        Supermarket supermarketMock = Mockito.mock(Supermarket.class);
+        ShoppingList shoppingList = new ShoppingList(supermarketMock);
+        Product p1 = new Product("p1", "p1", 0);
+        Product p2 = new Product("p2", "p2", 0);
+        Product p3 = new Product("p3", "p3", 0);
+        shoppingList.addProduct(p1);
+        shoppingList.addProduct(p2);
+        shoppingList.addProduct(p3);
+        int numOfProductsAfterAdding = ((List<Product>)Whitebox.getInternalState(shoppingList, "products")).size();
+
+        assertEquals(3, numOfProductsAfterAdding);
+    }
+
+    @Test
+    public void testAddProductWithPositiveQuantityProductsToEmptyList() {
+        Supermarket supermarketMock = Mockito.mock(Supermarket.class);
+        ShoppingList shoppingList = new ShoppingList(supermarketMock);
+        Product p1 = new Product("p1", "p1", 4);
+        Product p2 = new Product("p2", "p2", 2);
+        Product p3 = new Product("p3", "p3", 9);
+        shoppingList.addProduct(p1);
+        shoppingList.addProduct(p2);
+        shoppingList.addProduct(p3);
+        int numOfProductsAfterAdding = ((List<Product>)Whitebox.getInternalState(shoppingList, "products")).size();
+
+        assertEquals(3, numOfProductsAfterAdding);
+    }
+
+    @Test
+    public void testAddProductWithMixedProductsToEmptyList() {
+        Supermarket supermarketMock = Mockito.mock(Supermarket.class);
+        ShoppingList shoppingList = new ShoppingList(supermarketMock);
+        Product p1 = new Product("p1", "p1", 2);
+        Product p2 = new Product("p2", "p2", 0);
+        Product p3 = new Product("p3", "p3", 5);
+        Product p4 = new Product("p4", "p4", 0);
+        shoppingList.addProduct(p1);
+        shoppingList.addProduct(p2);
+        shoppingList.addProduct(p3);
+        shoppingList.addProduct(p4);
+        int numOfProductsAfterAdding = ((List<Product>)Whitebox.getInternalState(shoppingList, "products")).size();
+
+        assertEquals(4, numOfProductsAfterAdding);
+    }
+
+    @Test
+    public void testAddProductWithZeroQuantityProductsToNonEmptyList() {
+        Supermarket supermarketMock = Mockito.mock(Supermarket.class);
+        ShoppingList shoppingList = new ShoppingList(supermarketMock);
+        List<Product> productsList = new ArrayList<>();
+        productsList.add(new Product("p1", "p1", 7));
+        productsList.add(new Product("p2", "p2", 2));
+        Whitebox.setInternalState(shoppingList, "products", productsList);
+        int numOfProductsBeforeAdding = ((List<Product>)Whitebox.getInternalState(shoppingList, "products")).size();
+        Product p3 = new Product("p3", "p3", 0);
+        Product p4 = new Product("p4", "p4", 0);
+        shoppingList.addProduct(p3);
+        shoppingList.addProduct(p4);
+        int numOfProductsAfterAdding = ((List<Product>)Whitebox.getInternalState(shoppingList, "products")).size();
+
+        assertEquals(2, numOfProductsAfterAdding - numOfProductsBeforeAdding);
+    }
+
+    @Test
+    public void testAddProductWithPositiveQuantityProductsToNonEmptyList() {
+        Supermarket supermarketMock = Mockito.mock(Supermarket.class);
+        ShoppingList shoppingList = new ShoppingList(supermarketMock);
+        List<Product> productsList = new ArrayList<>();
+        productsList.add(new Product("p1", "p1", 3));
+        Whitebox.setInternalState(shoppingList, "products", productsList);
+        int numOfProductsBeforeAdding = ((List<Product>)Whitebox.getInternalState(shoppingList, "products")).size();
+        Product p2 = new Product("p2", "p2", 4);
+        Product p3 = new Product("p3", "p3", 9);
+        Product p4 = new Product("p4", "p4", 8);
+        shoppingList.addProduct(p2);
+        shoppingList.addProduct(p3);
+        shoppingList.addProduct(p4);
+        int numOfProductsAfterAdding = ((List<Product>)Whitebox.getInternalState(shoppingList, "products")).size();
+
+        assertEquals(3, numOfProductsAfterAdding - numOfProductsBeforeAdding);
+    }
+
+    @Test
+    public void testAddProductWithMixedQuantityProductsToNonEmptyList() {
+        Supermarket supermarketMock = Mockito.mock(Supermarket.class);
+        ShoppingList shoppingList = new ShoppingList(supermarketMock);
+        List<Product> productsList = new ArrayList<>();
+        productsList.add(new Product("p1", "p1", 4));
+        Whitebox.setInternalState(shoppingList, "products", productsList);
+        int numOfProductsBeforeAdding = ((List<Product>)Whitebox.getInternalState(shoppingList, "products")).size();
+        Product p2 = new Product("p2", "p2", 0);
+        Product p3 = new Product("p3", "p3", 6);
+        shoppingList.addProduct(p2);
+        shoppingList.addProduct(p3);
+        int numOfProductsAfterAdding = ((List<Product>)Whitebox.getInternalState(shoppingList, "products")).size();
+
+        assertEquals(2, numOfProductsAfterAdding - numOfProductsBeforeAdding);
+    }
 
     //------------------------
     // getMarketPrice
