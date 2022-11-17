@@ -13,8 +13,7 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Matchers.anyDouble;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class ShoppingListTest {
 
@@ -38,14 +37,12 @@ public class ShoppingListTest {
     public void testAddProductWithCombinationsOfProductsAndLists(List<Product> productsListBeforeAdding, Product[] productsToAdd, int expectedResult) {
         Supermarket supermarketMock = Mockito.mock(Supermarket.class);
         ShoppingList shoppingList = new ShoppingList(supermarketMock);
-        Whitebox.setInternalState(shoppingList, "products", productsListBeforeAdding);
-        if(productsToAdd != null) {
-            for(int i = 0; i < productsToAdd.length; i++)
-                shoppingList.addProduct(productsToAdd[i]);
-        }
-        int numOfProductsAfterAdding = ((List<Product>)Whitebox.getInternalState(shoppingList, "products")).size();
+        List<Product> spyProductsList = spy(new ArrayList<Product>(productsListBeforeAdding));
+        Whitebox.setInternalState(shoppingList, "products", spyProductsList);
+        for (Product product : productsToAdd)
+            shoppingList.addProduct(product);
 
-        assertEquals(expectedResult, numOfProductsAfterAdding);
+        verify(spyProductsList, times(expectedResult)).add(any(Product.class));
     }
 
     private static Stream<Arguments> addProductParams() {
@@ -86,18 +83,23 @@ public class ShoppingListTest {
                 //adding mixed quantity products to empty list:
                 Arguments.of(new ArrayList<>(), new Product[]{positiveQuantityProduct1, noQuantityProduct1}, 2),
                 //adding zero quantity products to non-empty list with zero quantity products:
-                Arguments.of(new ArrayList<>(zeroQuantityProductsList), new Product[]{noQuantityProduct4, noQuantityProduct5, noQuantityProduct6}, 3),
+                Arguments.of(zeroQuantityProductsList, new Product[]{noQuantityProduct4, noQuantityProduct5, noQuantityProduct6}, 3),
                 //adding positive quantity products to non-empty list with zero quantity products:
-                Arguments.of(new ArrayList<>(zeroQuantityProductsList), new Product[]{positiveQuantityProduct1, positiveQuantityProduct2}, 2),
+                Arguments.of(zeroQuantityProductsList, new Product[]{positiveQuantityProduct1, positiveQuantityProduct2}, 2),
                 //adding mixed quantity products to non-empty list with zero quantity products:
-                Arguments.of(new ArrayList<>(zeroQuantityProductsList), new Product[]{positiveQuantityProduct1, positiveQuantityProduct2, noQuantityProduct4, noQuantityProduct5}, 4),
+                Arguments.of(zeroQuantityProductsList, new Product[]{positiveQuantityProduct1, positiveQuantityProduct2, noQuantityProduct4, noQuantityProduct5}, 4),
                 //adding zero quantity products to non-empty list with positive quantity products:
-                Arguments.of(new ArrayList<>(positiveQuantityProductsList), new Product[]{noQuantityProduct1}, 1),
+                Arguments.of(positiveQuantityProductsList, new Product[]{noQuantityProduct1}, 1),
                 //adding positive quantity products to non-empty list with positive quantity products:
-                Arguments.of(new ArrayList<>(positiveQuantityProductsList), new Product[]{positiveQuantityProduct4, positiveQuantityProduct5}, 2),
+                Arguments.of(positiveQuantityProductsList, new Product[]{positiveQuantityProduct4, positiveQuantityProduct5}, 2),
                 //adding mixed quantity products to non-empty list with positive quantity products:
-                Arguments.of(new ArrayList<>(positiveQuantityProductsList), new Product[]{positiveQuantityProduct3, noQuantityProduct3, noQuantityProduct4}, 3)
-                //TODO: continue
+                Arguments.of(positiveQuantityProductsList, new Product[]{positiveQuantityProduct3, noQuantityProduct3, noQuantityProduct4}, 3),
+                //adding zero quantity products to non-empty list with mixed quantity products:
+                Arguments.of(mixedQuantityProductsList, new Product[]{noQuantityProduct1}, 1),
+                //adding positive quantity products to non-empty list with mixed quantity products:
+                Arguments.of(mixedQuantityProductsList, new Product[]{positiveQuantityProduct3, positiveQuantityProduct4, positiveQuantityProduct5, positiveQuantityProduct6}, 4),
+                //adding mixed quantity products to non-empty list with mixed quantity products:
+                Arguments.of(mixedQuantityProductsList, new Product[]{positiveQuantityProduct3, positiveQuantityProduct4, noQuantityProduct3}, 3)
         );
     }
 
