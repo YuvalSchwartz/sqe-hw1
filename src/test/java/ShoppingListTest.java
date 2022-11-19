@@ -24,21 +24,6 @@ import static org.mockito.Matchers.anyDouble;
 import static org.mockito.Mockito.*;
 
 public class ShoppingListTest {
-
-    /*
-        Method Naming Convention - When writing test methods, there are multiple approaches:
-
-        should[action]
-        Example: mailShouldBeSent or cartShouldGetCleared
-
-        should[consequence]when[action]
-        Example: shouldBanWhenEULAIsBroken
-
-        Given[input]When[action]Then[consequence]
-        Given_UserIsLoggedIn_When_SessionIsExpired_Then_LogoutUser
-
-     */
-
     static Supermarket supermarketMock = null;
     static ShoppingList shoppingList;
     static ShoppingList shoppingListSpy;
@@ -243,22 +228,24 @@ public class ShoppingListTest {
         assertEquals(1.0, shoppingList.getDiscount(1.1));
     }
 
+
+    //------------------------
     // priceWithDelivery tests
+    //------------------------
     @ParameterizedTest
     @ValueSource(ints = {-1, -500, -750, -100000})
-    public void priceWithDelivery_shouldThrowExceptionWhenNegativeInput(int miles ){
+    public void priceWithDelivery_negative_miles_fail(int miles ){
         assertThrows(IllegalArgumentException.class, () -> shoppingList.priceWithDelivery(miles));
-
     }
 
     @ParameterizedTest
     @ValueSource(ints = {1, 10, Integer.MAX_VALUE})
-    public void priceWithDelivery_shouldReturn_0_WhenNoProducts(int miles){
+    public void priceWithDelivery_no_products_success(int miles){
         when(supermarketMock.calcDeliveryFee(miles, 0)).thenReturn(0.0);
         assertEquals(0,shoppingList.priceWithDelivery(miles));
     }
     @Test
-    public void priceWithDelivery_shouldReturnPriceWhenMiles_0(){
+    public void priceWithDelivery_miles_zero_success(){
         int miles = 0;
         Product p1 = new Product("12","Bamba",1);
         Product p2 = new Product("23","Bisli",1);
@@ -274,7 +261,7 @@ public class ShoppingListTest {
 
     @ParameterizedTest
     @ValueSource(ints = {1, 10, 15})
-    public void priceWithDelivery_shouldReturnPricePlusFeeWhenMiles_0(int miles){
+    public void priceWithDelivery_positive_miles_and_products_success(int miles){
 
         Product p1 = new Product("12","Bamba",1);
         Product p2 = new Product("23","Bisli",1);
@@ -289,18 +276,37 @@ public class ShoppingListTest {
     }
 
     @ParameterizedTest
+    @ValueSource(ints = {1, 10, 15})
+    public void priceWithDelivery_positive_miles_and_products_verify(int miles){
+
+        Product p1 = new Product("12","Bamba",1);
+        Product p2 = new Product("23","Bisli",1);
+        shoppingListSpy.addProduct(p1);
+        shoppingListSpy.addProduct(p2);
+
+        when(supermarketMock.getPrice("12")).thenReturn(5.0);
+        when(supermarketMock.getPrice("23")).thenReturn(6.0);
+        when(supermarketMock.calcDeliveryFee(miles, 2)).thenReturn(2.0 * miles);
+        shoppingListSpy.priceWithDelivery(miles);
+        verify(supermarketMock).calcDeliveryFee(miles,2);
+        verify(shoppingListSpy).getMarketPrice();
+
+    }
+
+    @ParameterizedTest
     @ValueSource(ints = {1, 10, Integer.MAX_VALUE})
-    public void priceWithDelivery_shouldReturnFeeWhenNoProducts(int miles){
+    public void priceWithDelivery_no_products_return_fee_success(int miles){
         when(supermarketMock.calcDeliveryFee(miles, 0)).thenReturn(miles * 1.0) ;
         assertEquals(miles,shoppingList.priceWithDelivery(miles));
     }
+
+    //------------------------
     // changeQuantity tests
     //------------------------
 
-    //TODO: implement
     @ParameterizedTest
     @ValueSource(ints = {-1, -500, -750, -100000})
-    public void changeQuantity_shouldThrowExceptionWhenNegativeInput(int quantity ){
+    public void changeQuantity_negative_quantity_fail(int quantity ){
         Product p1 = new Product("12","Bamba",1);
         Product p2 = new Product("23","Bisli",1);
         shoppingList.addProduct(p1);
@@ -311,15 +317,94 @@ public class ShoppingListTest {
     }
 
     @ParameterizedTest
+    @ValueSource(ints = {-1, -500, -750, -100000})
+    public void changeQuantity_negative_quantity_verify(int quantity ){
+        Product p1Spy = spy(new Product("12","Bamba",1));
+        Product p2Spy = spy(new Product("23","Bisli",1));
+        shoppingList.addProduct(p1Spy);
+        shoppingList.addProduct(p2Spy);
+        try{
+            shoppingList.changeQuantity(quantity, "12");
+        }
+        catch (IllegalArgumentException e){
+
+        }
+        verify(p1Spy, times(0)).setQuantity(quantity);
+
+    }
+
+    @ParameterizedTest
     @ValueSource(ints = {1, 3, 100000})
-    public void changeQuantity_shouldNotChangeWhenNoProduct(int quantity ){
+    public void changeQuantity_change_product_not_in_the_list_success(int quantity ){
+        List<Product> spyProductsList = spy(new ArrayList<Product>());
+        Whitebox.setInternalState(shoppingList, "products", spyProductsList);
         Product p1 = new Product("12","Bamba",1);
         Product p2 = new Product("23","Bisli",1);
         shoppingList.addProduct(p1);
         shoppingList.addProduct(p2);
-
-        assertThrows(IllegalArgumentException.class, () -> shoppingList.changeQuantity(quantity, "45"));
-
+        shoppingList.changeQuantity(quantity, "45");
+        assertEquals(2, spyProductsList.size());
     }
 
+    @Test
+    public void changeQuantity_quantity_zero_success(){
+        List<Product> spyProductsList = spy(new ArrayList<Product>());
+        Whitebox.setInternalState(shoppingList, "products", spyProductsList);
+        Product p1 = new Product("12","Bamba",1);
+        Product p2 = new Product("23","Bisli",1);
+        shoppingList.addProduct(p1);
+        shoppingList.addProduct(p2);
+        shoppingList.changeQuantity(0, "12");
+        assertFalse(spyProductsList.contains(p1));
+        assertTrue(spyProductsList.contains(p2));
+    }
+
+    @ParameterizedTest
+    @MethodSource("changeQuantityParams")
+    public void changeQuantity_positive_quantity_success(int q1, int q2){
+        Product p1 = new Product("12","Bamba",1);
+        Product p2 = new Product("23","Bisli",1);
+        shoppingList.addProduct(p1);
+        shoppingList.addProduct(p2);
+        shoppingList.changeQuantity(q1, "12");
+        shoppingList.changeQuantity(q2, "23");
+        assertTrue(p1.getQuantity() == q1 && p2.getQuantity() == q2);
+    }
+
+    @ParameterizedTest
+    @MethodSource("changeQuantityParams")
+    public void changeQuantity_positive_quantity_verify(int q1, int q2){
+        Product p1Spy = spy(new Product("12","Bamba",1));
+        Product p2Spy = spy(new Product("23","Bisli",1));
+        shoppingList.addProduct(p1Spy);
+        shoppingList.addProduct(p2Spy);
+        shoppingList.changeQuantity(q1, "12");
+        shoppingList.changeQuantity(q2, "23");
+        verify(p1Spy).setQuantity(q1);
+        verify(p2Spy).setQuantity(q2);
+    }
+
+
+    private static Stream<Arguments> changeQuantityParams() {
+        return Stream.of(
+                Arguments.of(5, 6),
+                Arguments.of(3, 1),
+                Arguments.of(Integer.MAX_VALUE, 19)
+        );
+    }
+
+    @Test
+    public void changeQuantity_quantity_zero_verify(){
+        List<Product> spyProductsList = spy(new ArrayList<Product>());
+        Whitebox.setInternalState(shoppingList, "products", spyProductsList);
+        Product p1 = new Product("12","Bamba",1);
+        Product p2 = new Product("23","Bisli",1);
+        shoppingList.addProduct(p1);
+        shoppingList.addProduct(p2);
+        shoppingList.changeQuantity(0, "12");
+        Product p1Spy = spy(p1);
+        Mockito.verify(spyProductsList).remove(p1);
+        Mockito.verify(p1Spy, times(0)).setQuantity(0);
+
+    }
 }
